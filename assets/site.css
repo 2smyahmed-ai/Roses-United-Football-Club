@@ -159,7 +159,7 @@ svg{width:1em;height:1em;flex:none}
 .hero-progress i{width:28px;height:2px;background:rgb(255 255 255 / .28);overflow:hidden;position:relative}
 .hero-progress i::after{content:"";position:absolute;inset:0;background:#fff;transform:scaleX(0);transform-origin:left}
 .hero-progress i.is-done::after{transform:scaleX(1)}
-.hero-progress i.is-on::after{animation:prog 6s linear forwards}
+.hero-progress i.is-on::after{animation:prog 4.5s linear forwards}
 @keyframes prog{to{transform:scaleX(1)}}
 .hero-copy{width:100%;padding-top:calc(var(--hd-h) + 60px);padding-bottom:clamp(56px,8vw,110px);position:relative}
 .hero-h{font-family:var(--f-display);font-weight:900;text-transform:uppercase;font-size:clamp(4.2rem,15.5vw,15.5rem);line-height:.8;letter-spacing:-.012em;margin:6px 0 30px}
@@ -280,11 +280,20 @@ svg{width:1em;height:1em;flex:none}
 .way-item h3{font-family:var(--f-display);font-weight:800;text-transform:uppercase;font-size:clamp(2.2rem,4.2vw,3.8rem);line-height:.9;margin:12px 0 22px}
 .way-item blockquote p{font-family:var(--f-serif);font-size:clamp(1.1rem,1.5vw,1.36rem);line-height:1.5;font-style:italic;color:rgb(245 241 234 / .9)}
 .way-item cite{display:block;margin-top:14px;font-style:normal;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mute-ink)}
+.way-bars{display:none}
 @media (max-width:900px){
-  .way-grid{grid-template-columns:1fr}
+  .way-grid{display:block}
   .way-sticky{position:relative;top:0;height:auto;aspect-ratio:4/3.4}
-  .way-item{opacity:1;padding:36px 0}
-  .way-sticky{display:none}
+  .way-photo img{object-position:50% 25%}
+  .way-bars{display:flex;gap:6px;margin-top:14px}
+  .way-bars button{flex:1;height:28px;position:relative}
+  .way-bars button::before,.way-bars button::after{content:"";position:absolute;left:0;right:0;top:12px;height:3px;background:rgb(255 255 255 / .2)}
+  .way-bars button::after{background:var(--rose-ink);transform:scaleX(0);transform-origin:left}
+  .way-bars button.is-done::after{transform:scaleX(1)}
+  .way-bars button.is-on::after{animation:prog var(--wd,5.5s) linear forwards}
+  .way-list{display:grid}
+  .way-item{grid-area:1/1;padding:18px 0 0;border-top:0;opacity:0;visibility:hidden;transform:translateX(16px);transition:opacity .5s var(--ease),transform .6s var(--ease),visibility .5s}
+  .way-item.is-on{opacity:1;visibility:visible;transform:none}
 }
 
 /* ---------- session board ---------- */
@@ -756,6 +765,5 @@ body[data-page="join"] .hd:not(.is-solid) .hd-cta{background:var(--ink)}
   .jersey{min-height:450px}
   .board-cap{margin-top:34px}
   .row-ctas .btn{flex:1 1 100%}
-  .way-sticky{display:block;aspect-ratio:4/3;margin-bottom:8px}
   .way-num{font-size:5rem}
 }

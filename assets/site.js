@@ -574,14 +574,29 @@
 
   /* ---------------- the roses way (scroll-linked) ---------------- */
   const wayItems = $$('.way-item'), wayPhotos = $$('.way-photo'), wayNum = $('.way-num span');
-  const wio = new IntersectionObserver((es) => es.forEach((e) => {
-    if (!e.isIntersecting) return;
-    const i = +e.target.dataset.way;
-    wayItems.forEach((n, j) => n.classList.toggle('is-on', j === i));
-    wayPhotos.forEach((n, j) => n.classList.toggle('is-on', j === i));
-    if (wayNum) wayNum.textContent = '0' + (i + 1);
-  }), { rootMargin: '-45% 0px -45% 0px' });
+  // Desktop: the sticky photo follows the scroll. Phones: the steps advance on a timer (tap a bar or swipe to jump).
+  const wayBars = $$('.way-bars button'), wayMQ = matchMedia('(max-width: 900px)'), WAY_MS = 5500;
+  let wayI = 0, wayT = 0, wayVis = false;
+  function wayGo(i) {
+    wayI = (i + wayItems.length) % wayItems.length;
+    wayItems.forEach((n, j) => n.classList.toggle('is-on', j === wayI));
+    wayPhotos.forEach((n, j) => n.classList.toggle('is-on', j === wayI));
+    if (wayNum) wayNum.textContent = '0' + (wayI + 1);
+    wayBars.forEach((b, j) => { b.classList.remove('is-on'); b.classList.toggle('is-done', j < wayI); b.setAttribute('aria-selected', String(j === wayI)); b.style.setProperty('--wd', WAY_MS + 'ms'); });
+    clearTimeout(wayT);
+    if (wayMQ.matches && wayVis && !reduce) { void wayBars[wayI]?.offsetWidth; wayBars[wayI]?.classList.add('is-on'); wayT = setTimeout(() => wayGo(wayI + 1), WAY_MS); }
+  }
+  const wio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting && !wayMQ.matches) wayGo(+e.target.dataset.way); }), { rootMargin: '-45% 0px -45% 0px' });
   wayItems.forEach((n) => wio.observe(n));
+  const wayGrid = $('.way-grid');
+  if (wayGrid) {
+    new IntersectionObserver(([e]) => { wayVis = e.isIntersecting; if (wayMQ.matches) wayVis ? wayGo(wayI) : clearTimeout(wayT); }, { threshold: 0.3 }).observe(wayGrid);
+    wayBars.forEach((b, j) => b.addEventListener('click', () => wayGo(j)));
+    let wx = 0;
+    wayGrid.addEventListener('touchstart', (e) => (wx = e.touches[0].clientX), { passive: true });
+    wayGrid.addEventListener('touchend', (e) => { const dx = e.changedTouches[0].clientX - wx; if (wayMQ.matches && Math.abs(dx) > 50) wayGo(wayI + (dx < 0 ? 1 : -1)); });
+    wayMQ.addEventListener('change', () => wayGo(wayI));
+  }
 
   /* ---------------- hero slideshow ---------------- */
   const slides = $$('.hero-slide'), bars = $$('.hero-progress i');
@@ -591,7 +606,7 @@
     slides.forEach((s, j) => s.classList.toggle('is-on', j === hs));
     bars.forEach((b, j) => { b.classList.remove('is-on'); b.classList.toggle('is-done', j < hs); });
     void bars[hs]?.offsetWidth; bars[hs]?.classList.add('is-on');
-    clearTimeout(hsT); if (!reduce) hsT = setTimeout(() => heroGo(hs + 1), 6000);
+    clearTimeout(hsT); if (!reduce) hsT = setTimeout(() => heroGo(hs + 1), 4500);
   }
 
   /* ---------------- header / scroll ---------------- */
